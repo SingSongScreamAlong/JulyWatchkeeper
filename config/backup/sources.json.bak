@@ -1,0 +1,448 @@
+{
+    "sources": [
+        {
+            "name": "BBC World News",
+            "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "global_news",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Reuters World News", 
+            "url": "https://feeds.reuters.com/reuters/worldNews",
+            "type": "rss",
+            "language": "en",
+            "category": "global_news",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "CNN International",
+            "url": "https://rss.cnn.com/rss/edition.rss",
+            "type": "rss", 
+            "language": "en",
+            "category": "global_news",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Al Jazeera",
+            "url": "https://www.aljazeera.com/xml/rss/all.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "global_news",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Associated Press",
+            "url": "https://feeds.feedburner.com/apnews/world",
+            "type": "rss",
+            "language": "en",
+            "category": "global_news",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "The Guardian World",
+            "url": "https://www.theguardian.com/world/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "global_news",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Local France",
+            "url": "https://www.thelocal.fr/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "france",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Local Germany", 
+            "url": "https://www.thelocal.de/feed/",
+            "type": "rss",
+            "language": "en", 
+            "category": "europe",
+            "region": "germany",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "France 24",
+            "url": "https://www.france24.com/en/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "france", 
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Deutsche Welle",
+            "url": "https://rss.dw.com/rdf/rss-en-all",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "germany",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Open Doors USA",
+            "url": "https://www.opendoorsusa.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "International Christian Concern",
+            "url": "https://www.persecution.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Christian Post",
+            "url": "https://www.christianpost.com/feed",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_news",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Christianity Today",
+            "url": "https://www.christianitytoday.com/ct/rss.html",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_news",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "South China Morning Post",
+            "url": "https://www.scmp.com/rss/91/feed",
+            "type": "rss",
+            "language": "en",
+            "category": "asia",
+            "region": "china",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "The Hindu",
+            "url": "https://www.thehindu.com/news/international/feeder/default.rss",
+            "type": "rss",
+            "language": "en",
+            "category": "asia",
+            "region": "india",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Japan Times",
+            "url": "https://www.japantimes.co.jp/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "asia",
+            "region": "japan",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Africa News",
+            "url": "https://www.africanews.com/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "africa",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "AllAfrica",
+            "url": "https://allafrica.com/tools/headlines/rdf/latest/headlines.rdf",
+            "type": "rss",
+            "language": "en",
+            "category": "africa",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Middle East Eye",
+            "url": "https://www.middleeasteye.net/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "middle_east",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "The Jerusalem Post",
+            "url": "https://www.jpost.com/rss/rssfeedsfrontpage.aspx",
+            "type": "rss",
+            "language": "en",
+            "category": "middle_east",
+            "region": "israel",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Times of Israel",
+            "url": "https://www.timesofisrael.com/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "middle_east",
+            "region": "israel",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Latin America News",
+            "url": "https://latinamericanpost.com/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "latin_america",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Buenos Aires Times",
+            "url": "https://www.batimes.com.ar/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "latin_america",
+            "region": "argentina",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Human Rights Watch",
+            "url": "https://www.hrw.org/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "human_rights",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Amnesty International",
+            "url": "https://www.amnesty.org/en/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "human_rights",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "United Nations News",
+            "url": "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "international_orgs",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Relief Web",
+            "url": "https://reliefweb.int/updates/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "UNHCR",
+            "url": "https://www.unhcr.org/en-us/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "focus": "refugees",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Voice of the Martyrs",
+            "url": "https://www.persecution.com/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "BBC Europe",
+            "url": "https://feeds.bbci.co.uk/news/world/europe/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Euronews",
+            "url": "https://www.euronews.com/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Politico Europe",
+            "url": "https://www.politico.eu/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "focus": "politics",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Local Italy",
+            "url": "https://www.thelocal.it/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "italy",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Local Spain",
+            "url": "https://www.thelocal.es/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "spain",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Local Sweden",
+            "url": "https://www.thelocal.se/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "sweden",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Local Switzerland",
+            "url": "https://www.thelocal.ch/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "switzerland",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Local Austria",
+            "url": "https://www.thelocal.at/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "austria",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Local Denmark",
+            "url": "https://www.thelocal.dk/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "denmark",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Local Norway",
+            "url": "https://www.thelocal.no/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "norway",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "EU Observer",
+            "url": "https://euobserver.com/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "focus": "politics",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Radio Free Europe",
+            "url": "https://www.rferl.org/api/zrqitfetmv",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "focus": "eastern_europe",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Balkan Insight",
+            "url": "https://balkaninsight.com/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "balkans",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Irish Times",
+            "url": "https://www.irishtimes.com/rss/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "ireland",
+            "reliability": 8,
+            "enabled": true
+        }
+    ],
+    "investigation_patterns": [
+        "missionary safety {location}",
+        "christian persecution {location}", 
+        "religious freedom {location}",
+        "church {location} news",
+        "protests {location}",
+        "security situation {location}",
+        "civil unrest {location}",
+        "political stability {location}",
+        "travel advisory {location}",
+        "religious violence {location}",
+        "missionary work {location}",
+        "humanitarian access {location}",
+        "visa restrictions {location}",
+        "foreign aid workers {location}",
+        "NGO safety {location}",
+        "kidnapping risk {location}",
+        "terrorism threat {location}",
+        "border security {location}",
+        "disease outbreak {location}",
+        "natural disaster {location}"
+    ]
+}

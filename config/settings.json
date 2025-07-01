@@ -1,0 +1,45 @@
+{
+    "guardian_config": {
+        "version": "1.0.0",
+        "name": "WATCHKEEPER",
+        "description": "Autonomous Intelligence System for Missionary Protection",
+        
+        "system_settings": {
+            "max_memory_usage_mb": 2048,
+            "max_concurrent_agents": 3,
+            "intelligence_cycle_minutes": 30,
+            "max_articles_per_source": 8,
+            "content_length_limit": 3000,
+            "enable_autonomous_investigation": true,
+            "max_investigations_per_cycle": 3
+        },
+        
+        "threat_assessment": {
+            "minimum_threat_level_alert": 6,
+            "minimum_missionary_relevance_alert": 7,
+            "minimum_confidence_threshold": 0.4,
+            "focus_regions": ["europe", "global"],
+            "priority_keywords": [
+                "missionary", "christian", "persecution", "church",
+                "religious freedom", "violence", "protest", "security"
+            ]
+        },
+        
+        "stealth_settings": {
+            "enable_stealth_mode": true,
+            "navigation_delay_min": 2,
+            "navigation_delay_max": 5,
+            "max_retries": 2,
+            "timeout_seconds": 20,
+            "user_agent_rotation": true
+        },
+        
+        "output_settings": {
+            "log_level": "INFO",
+            "save_intelligence_to_db": true,
+            "display_console_alerts": true,
+            "max_console_alerts": 10,
+            "alert_sound_enabled": false
+        }
+    }
+}

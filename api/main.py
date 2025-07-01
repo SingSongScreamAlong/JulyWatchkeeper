@@ -1,0 +1,120 @@
+"""
+WatchKeeper API - Main Entry Point
+Provides a REST API for Sentinel to access intelligence data
+"""
+import os
+import sys
+from typing import Dict, List, Optional
+from datetime import datetime
+from pathlib import Path
+
+# Add parent directory to path to import guardian modules
+sys.path.append(str(Path(__file__).parent.parent))
+
+from fastapi import FastAPI, Depends, HTTPException, Header, status
+from fastapi.security import APIKeyHeader
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Import from db module - must be after load_dotenv
+from api.db import logger, config
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="WatchKeeper API",
+    description="API for accessing WatchKeeper intelligence data",
+    version="1.0.0"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, replace with specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# API key security
+API_KEY_NAME = "Authorization"
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+
+# Get API key from environment or config
+API_KEY = os.getenv("API_KEY", config.get("api", {}).get("key", ""))
+
+# Authentication dependency
+async def get_api_key(api_key_header: str = Header(None, alias=API_KEY_NAME)):
+    if not API_KEY:
+        logger.warning("API key not configured, authentication disabled")
+        return True
+        
+    if not api_key_header:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="API key missing"
+        )
+    
+    # Check for "Bearer " prefix
+    if api_key_header.startswith("Bearer "):
+        api_key_header = api_key_header[7:]
+        
+    if api_key_header != API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid API key"
+        )
+    return True
+
+# Import API routes - moved after app initialization to avoid circular imports
+from api.v1.intelligence import router as intelligence_router
+from api.v1.sitrep import router as sitrep_router
+# Include routers
+app.include_router(intelligence_router, prefix="/api/v1", dependencies=[Depends(get_api_key)])
+app.include_router(sitrep_router, prefix="/api/v1", dependencies=[Depends(get_api_key)])
+# Import and setup WebSocket routes
+from src.api.websocket import setup_websocket_routes
+
+# Setup WebSocket routes
+setup_websocket_routes(app)
+
+@app.get("/")
+async def root():
+    return {
+        "name": "WatchKeeper API",
+        "version": "1.0.0",
+        "status": "operational",
+        "documentation": "/docs"
+    }
+
+@app.get("/health")
+async def health_check():
+    try:
+        from api.db import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM intelligence_items")
+        count = cursor.fetchone()[0]
+        conn.close()
+        
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "intelligence_items": count,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
+if __name__ == "__main__":
+    # Run the API server
+    port = int(os.getenv("API_PORT", "8000"))
+    uvicorn.run("api.main:app", host="0.0.0.0", port=port, reload=True)

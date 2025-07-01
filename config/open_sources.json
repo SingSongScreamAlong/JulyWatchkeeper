@@ -1,0 +1,378 @@
+{
+    "emergency_alerts": [
+        {
+            "name": "GDACS",
+            "description": "Global Disaster Alert and Coordination System - UN/EU cooperation framework for real-time disaster alerts",
+            "url": "https://www.gdacs.org/xml/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "emergency",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "GDACS Earthquake Feed",
+            "description": "GDACS earthquake alerts in Common Alerting Protocol format",
+            "url": "https://www.gdacs.org/xml/rss_eq_7d.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "emergency",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "GDACS Tropical Cyclone Feed",
+            "description": "GDACS tropical cyclone alerts",
+            "url": "https://www.gdacs.org/xml/rss_tc_7d.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "emergency",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "GDACS Flood Feed",
+            "description": "GDACS flood alerts",
+            "url": "https://www.gdacs.org/xml/rss_fl_7d.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "emergency",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "MeteoAlarm Europe",
+            "description": "European Weather Warnings from 38 national meteorological services",
+            "url": "https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-europe",
+            "type": "rss",
+            "language": "en",
+            "category": "weather",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "EMSC Earthquakes",
+            "description": "European-Mediterranean Seismological Centre earthquake information",
+            "url": "https://www.emsc-csem.org/service/rss/rss.php?typ=emsc",
+            "type": "rss",
+            "language": "en",
+            "category": "emergency",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "EMSC Significant Earthquakes",
+            "description": "EMSC significant earthquakes (M5.0+ in Euro-Med, M7.0+ globally)",
+            "url": "https://www.emsc-csem.org/service/rss/rss.php?typ=emsc&magmin=5",
+            "type": "rss",
+            "language": "en",
+            "category": "emergency",
+            "reliability": 9,
+            "enabled": true
+        }
+    ],
+    "weather_environment": [
+        {
+            "name": "Copernicus EFAS",
+            "description": "European Flood Awareness System - flood forecasts",
+            "url": "https://www.efas.eu/en/news",
+            "type": "web",
+            "language": "en",
+            "category": "weather",
+            "reliability": 8,
+            "enabled": true,
+            "selectors": {
+                "items": ".views-row",
+                "title": "h2",
+                "content": ".field--name-body",
+                "date": ".field--name-node-post-date"
+            }
+        },
+        {
+            "name": "Copernicus EFFIS",
+            "description": "European Forest Fire Information System - wildfire danger and monitoring",
+            "url": "https://effis.jrc.ec.europa.eu/apps/effis.current.situation/",
+            "type": "web",
+            "language": "en",
+            "category": "weather",
+            "reliability": 8,
+            "enabled": true,
+            "selectors": {
+                "items": ".news-item",
+                "title": "h3",
+                "content": ".news-content",
+                "date": ".news-date"
+            }
+        },
+        {
+            "name": "OpenWeatherMap Current Weather",
+            "description": "Current weather conditions for global cities",
+            "url": "https://api.openweathermap.org/data/2.5/weather",
+            "type": "api",
+            "language": "en",
+            "category": "weather",
+            "reliability": 7,
+            "enabled": true,
+            "params": {
+                "q": "London,Paris,Berlin,Madrid,Rome,Warsaw,Vienna,Athens,Brussels,Amsterdam,Stockholm,Dublin,Prague,Budapest,Copenhagen,Helsinki,Lisbon,Bucharest,Sofia,Bratislava",
+                "units": "metric",
+                "appid": "$OPENWEATHER_API_KEY"
+            },
+            "env_vars": [
+                "OPENWEATHER_API_KEY"
+            ]
+        },
+        {
+            "name": "ECDC Disease Outbreaks",
+            "description": "European Centre for Disease Prevention and Control outbreak alerts",
+            "url": "https://www.ecdc.europa.eu/en/threats-and-outbreaks/reports-and-data/weekly-threats",
+            "type": "web",
+            "language": "en",
+            "category": "health",
+            "reliability": 9,
+            "enabled": true,
+            "selectors": {
+                "items": ".content-item",
+                "title": "h3 a",
+                "content": ".field--name-field-summary",
+                "date": ".date-display-single"
+            }
+        }
+    ],
+    "conflict_security": [
+        {
+            "name": "ACLED Data API",
+            "description": "Armed Conflict Location & Event Data Project - tracking political violence and protests",
+            "url": "https://api.acleddata.com/acled/read",
+            "type": "api",
+            "language": "en",
+            "category": "security",
+            "reliability": 8,
+            "enabled": true,
+            "params": {
+                "key": "$ACLED_API_KEY",
+                "event_date": "2023-01-01:2025-12-31",
+                "event_date_where": "BETWEEN",
+                "region": "Europe",
+                "limit": 500
+            },
+            "env_vars": [
+                "ACLED_API_KEY"
+            ],
+            "response_format": "json",
+            "data_path": "data"
+        },
+        {
+            "name": "US State Department Travel Advisories",
+            "description": "Official US government travel safety advisories",
+            "url": "https://travel.state.gov/_res/rss/TAsTWs.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "security",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "UK FCDO Travel Advice",
+            "description": "UK Foreign, Commonwealth & Development Office travel advice",
+            "url": "https://www.gov.uk/api/content/foreign-travel-advice",
+            "type": "api",
+            "language": "en",
+            "category": "security",
+            "reliability": 8,
+            "enabled": true,
+            "response_format": "json",
+            "data_path": "links.children",
+            "params": {
+                "format": "json",
+                "limit": 100
+            }
+        },
+        {
+            "name": "Global Incident Map",
+            "description": "Real-time incident mapping service",
+            "url": "https://www.globalincidentmap.com/threatmatrix/",
+            "type": "web",
+            "language": "en",
+            "category": "security",
+            "reliability": 7,
+            "enabled": true,
+            "selectors": {
+                "item": ".incident-item",
+                "title": ".incident-title",
+                "description": ".incident-description",
+                "date": ".incident-date",
+                "location": ".incident-location"
+            }
+        }
+    ],
+    "news_media": [
+        {
+            "name": "Europe Media Monitor NewsBrief",
+            "description": "EU-managed multilingual news aggregator processing ~300,000 articles daily",
+            "url": "https://emm.newsbrief.eu/rss?type=alert&language=all&duplicates=false",
+            "type": "rss",
+            "language": "en",
+            "category": "news",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "GDELT Events API",
+            "description": "Global Database of Events, Language, and Tone - worldwide news monitoring",
+            "url": "https://api.gdeltproject.org/api/v2/context/context",
+            "type": "api",
+            "language": "en",
+            "category": "news",
+            "reliability": 7,
+            "enabled": true,
+            "params": {
+                "format": "json",
+                "query": "security crisis europe",
+                "mode": "artlist",
+                "maxrecords": 250,
+                "sort": "DateDesc"
+            }
+        },
+        {
+            "name": "GDELT Global Knowledge Graph",
+            "description": "GDELT knowledge graph for entity and theme extraction",
+            "url": "https://api.gdeltproject.org/api/v1/gkg_geonames",
+            "type": "api",
+            "language": "en",
+            "category": "news",
+            "reliability": 7,
+            "enabled": true,
+            "params": {
+                "QUERY": "domain:news AND locations:\"Europe\" AND themes:\"SECURITY\"",
+                "TIMESPAN": "1d",
+                "FORMAT": "json",
+                "MAXRECORDS": 250
+            }
+        },
+        {
+            "name": "eurotopics Press Review",
+            "description": "European press roundup reflecting diverse opinions across Europe",
+            "url": "https://www.eurotopics.net/export/en/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "news",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "ReliefWeb Updates",
+            "description": "UN OCHA humanitarian information service for crises and emergencies",
+            "url": "https://reliefweb.int/updates?format=xml",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "ReliefWeb Europe",
+            "description": "ReliefWeb updates specific to Europe",
+            "url": "https://reliefweb.int/updates?advanced-search=%28PC12.R4%29&format=xml",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Forum 18 News Service",
+            "description": "Norwegian initiative reporting on freedom of religion and belief",
+            "url": "https://www.forum18.org/rss.php",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "reliability": 8,
+            "enabled": true
+        }
+    ],
+    "migration_humanitarian": [
+        {
+            "name": "UNHCR Operational Data Portal",
+            "description": "UN High Commissioner for Refugees data on displaced populations",
+            "url": "https://data.unhcr.org/en/rss/updates",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "UNHCR Europe Refugee Situation",
+            "description": "UNHCR updates on refugee situation in Europe",
+            "url": "https://data.unhcr.org/en/situations/mediterranean/location/5179",
+            "type": "web",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 9,
+            "enabled": true,
+            "selectors": {
+                "items": ".situation-update",
+                "title": "h3",
+                "content": ".update-content",
+                "date": ".update-date"
+            }
+        },
+        {
+            "name": "IOM Missing Migrants Project",
+            "description": "International Organization for Migration tracking deaths of migrants",
+            "url": "https://missingmigrants.iom.int/api/incidents/latest",
+            "type": "api",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 8,
+            "enabled": true,
+            "params": {
+                "region": "Europe",
+                "limit": 100
+            },
+            "response_format": "json",
+            "data_path": "data"
+        }
+    ],
+    "social_media": [
+        {
+            "name": "Reddit Europe",
+            "description": "Reddit Europe subreddit for European news and discussions",
+            "url": "https://www.reddit.com/r/europe/.json",
+            "type": "api",
+            "language": "en",
+            "category": "social_media",
+            "reliability": 5,
+            "enabled": true,
+            "response_format": "json",
+            "data_path": "data.children",
+            "headers": {
+                "User-Agent": "WATCHKEEPER/1.0"
+            },
+            "params": {
+                "limit": 25,
+                "sort": "hot"
+            }
+        },
+        {
+            "name": "Reddit World News",
+            "description": "Reddit World News subreddit for global news",
+            "url": "https://www.reddit.com/r/worldnews/.json",
+            "type": "api",
+            "language": "en",
+            "category": "social_media",
+            "reliability": 5,
+            "enabled": true,
+            "response_format": "json",
+            "data_path": "data.children",
+            "headers": {
+                "User-Agent": "WATCHKEEPER/1.0"
+            },
+            "params": {
+                "limit": 25,
+                "sort": "hot"
+            }
+        }
+    ]
+}

@@ -1,0 +1,159 @@
+{
+    "sources": [
+        {
+            "name": "OSAC",
+            "url": "https://www.osac.gov/Content/Report/c0c5e3e0-b8a3-4b2e-a0a8-1a2b3c4d5e6f",
+            "type": "api",
+            "language": "en",
+            "category": "security_advisory",
+            "reliability": 9,
+            "enabled": true,
+            "api_key_required": true,
+            "api_key_env": "OSAC_API_KEY",
+            "params": {
+                "format": "json",
+                "limit": 100
+            }
+        },
+        {
+            "name": "GDELT Project",
+            "url": "https://api.gdeltproject.org/api/v2/context/context",
+            "type": "api",
+            "language": "en",
+            "category": "global_events",
+            "reliability": 8,
+            "enabled": true,
+            "query_params": {
+                "format": "json",
+                "mode": "artlist",
+                "maxrecords": 100
+            },
+            "params": {
+                "format": "json",
+                "mode": "artlist",
+                "maxrecords": 100,
+                "sort": "DateDesc"
+            }
+        },
+        {
+            "name": "International Crisis Group",
+            "url": "https://www.crisisgroup.org/rss-feed.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "conflict",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Open Doors",
+            "url": "https://www.opendoorsusa.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Christian Solidarity Worldwide",
+            "url": "https://www.csw.org.uk/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "World Watch Monitor",
+            "url": "https://www.worldwatchmonitor.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "ACLED",
+            "url": "https://api.acleddata.com/acled/read",
+            "type": "api",
+            "language": "en",
+            "category": "conflict_data",
+            "reliability": 9,
+            "enabled": true,
+            "api_key_required": true,
+            "api_key_env": "ACLED_API_KEY",
+            "params": {
+                "api_key": "$ACLED_API_KEY",
+                "event_date": "2023-01-01|2023-12-31",
+                "event_date_where": "BETWEEN",
+                "format": "json"
+            }
+        },
+        {
+            "name": "ReliefWeb API",
+            "url": "https://api.reliefweb.int/v1/reports",
+            "type": "api",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 9,
+            "enabled": true,
+            "query_params": {
+                "appname": "watchkeeper",
+                "limit": 50,
+                "sort": "date:desc"
+            },
+            "params": {
+                "appname": "watchkeeper",
+                "preset": "latest",
+                "limit": 50,
+                "format": "json"
+            }
+        },
+        {
+            "name": "Global Incident Map",
+            "url": "https://www.globalincidentmap.com/threatmatrix/",
+            "type": "web",
+            "language": "en",
+            "category": "security_incidents",
+            "reliability": 7,
+            "enabled": true,
+            "scrape_config": {
+                "elements": ".incident-item",
+                "title": ".incident-title",
+                "content": ".incident-description",
+                "date": ".incident-date"
+            },
+            "selectors": {
+                "item": ".incident-item",
+                "title": ".incident-title",
+                "description": ".incident-description",
+                "date": ".incident-date",
+                "location": ".incident-location"
+            }
+        },
+        {
+            "name": "IMB Piracy Reporting Centre",
+            "url": "https://www.icc-ccs.org/index.php/piracy-reporting-centre/live-piracy-report",
+            "type": "web",
+            "language": "en",
+            "category": "maritime_security",
+            "reliability": 9,
+            "enabled": true,
+            "scrape_config": {
+                "elements": "table tr",
+                "title": "td:nth-child(1)",
+                "content": "td:nth-child(2)",
+                "date": "td:nth-child(3)"
+            },
+            "selectors": {
+                "item": ".piracy-report",
+                "title": ".report-title",
+                "description": ".report-details",
+                "date": ".report-date",
+                "location": ".report-location"
+            }
+        }
+    ]
+}

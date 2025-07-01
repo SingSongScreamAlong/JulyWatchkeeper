@@ -1,0 +1,88 @@
+from typing import List, Optional, Union
+import os
+from pydantic import AnyHttpUrl, PostgresDsn, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """
+    Application settings.
+    
+    Environment variables will be loaded from .env file.
+    """
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=True)
+    
+    # Application Settings
+    VERSION: str = "1.0.0"
+    ENVIRONMENT: str = "development"
+    DEBUG: bool = True
+    WORKERS: int = 1
+    
+    # API Settings
+    API_V1_STR: str = "/api/v1"
+    SECRET_KEY: str = "watchkeeper_development_secret_key"
+    API_KEY_HEADER: str = "X-API-Key"
+    API_KEY: str = "watchkeeper_secure_api_key_2025"
+    
+    # CORS Settings
+    CORS_ORIGINS: List[AnyHttpUrl] = []
+    
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
+        if isinstance(v, str) and not v.startswith("["):
+            return [i.strip() for i in v.split(",")]
+        elif isinstance(v, (list, str)):
+            return v
+        raise ValueError(v)
+    
+    # Rate Limiting
+    RATE_LIMIT_PER_MINUTE: int = 60
+    
+    # Database Settings
+    DATABASE_URL: PostgresDsn
+    DATABASE_POOL_SIZE: int = 20
+    DATABASE_MAX_OVERFLOW: int = 10
+    
+    # Ollama AI Service
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3"
+    
+    # Logging
+    LOG_LEVEL: str = "INFO"
+    
+    # Collection Settings
+    DEFAULT_COLLECTION_FREQUENCY: int = 3600  # in seconds
+    MAX_RATE_LIMIT: int = 100  # requests per hour
+    
+    # WebSocket Settings
+    WEBSOCKET_ENABLED: bool = False
+    WEBSOCKET_HOST: str = "0.0.0.0"
+    WEBSOCKET_PORT: int = 8000
+    
+    # Sentinel Integration
+    SENTINEL_API_ENDPOINT: Optional[str] = None
+    SENTINEL_API_KEY: Optional[str] = None
+    
+    # Guardian Settings
+    GUARDIAN_ENABLED: bool = True
+    GUARDIAN_CYCLE_MINUTES: int = 30
+    GUARDIAN_DEBUG: bool = False
+    GUARDIAN_VERBOSE_LOGGING: bool = True
+    
+    # API Server Settings
+    API_HOST: str = "0.0.0.0"
+    API_PORT: int = 8000
+    
+    # Database Settings - Using PostgreSQL with asyncpg driver
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/watchkeeper"
+    
+    # Additional Guardian Settings
+    GUARDIAN_DB_PATH: str = "data/guardian_intelligence.db"
+    GUARDIAN_LOG_PATH: str = "data/logs/guardian.log"
+    GUARDIAN_MAX_MEMORY_MB: int = 2048
+    GUARDIAN_MAX_AGENTS: int = 3
+
+
+# Create settings instance
+settings = Settings()

@@ -1,0 +1,839 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""WATCHKEEPER - Autonomous Intelligence System for Missionary Protection
+
+This module implements the core functionality of the WATCHKEEPER system, including
+threat assessment, stealth web navigation, intelligence collection, and autonomous
+investigation capabilities.
+"""
+
+import os
+import sys
+import json
+import time
+import logging
+import sqlite3
+import asyncio
+import signal
+import random
+import argparse
+import traceback
+from typing import Dict, List, Set, Tuple, Any, Optional, Union
+from pathlib import Path
+from datetime import datetime, timedelta
+from dataclasses import dataclass, asdict, field
+
+# Third-party imports
+import aiohttp
+import nltk
+import feedparser
+import requests
+from bs4 import BeautifulSoup
+from playwright.async_api import async_playwright, Browser, Page
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
+# Configure logging
+logging_dir = Path('data/logs')
+logging_dir.mkdir(parents=True, exist_ok=True)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(logging_dir / 'watchkeeper.log', mode='a')
+    ]
+)
+logger = logging.getLogger('watchkeeper')
+
+# Ensure NLTK data is available
+try:
+    nltk.data.find('vader_lexicon')
+except LookupError:
+    logger.warning("NLTK Vader lexicon not found. Will be downloaded during setup.")
+
+
+@dataclass
+class IntelligenceItem:
+    """Data structure for intelligence items"""
+    id: Optional[int] = None
+    title: str = ""
+    content: str = ""
+    source: str = ""
+    url: str = ""
+    timestamp: datetime = field(default_factory=datetime.now)
+    threat_level: float = 0.0
+    missionary_relevance: float = 0.0
+    region: Optional[str] = None
+    location: Optional[str] = None
+    keywords: List[str] = field(default_factory=list)
+    sentiment_score: float = 0.0
+    confidence: float = 0.0
+    investigation_status: str = "pending"  # pending, in_progress, completed
+    investigation_data: Dict[str, Any] = field(default_factory=dict)
+
+
+class MissionaryThreatAssessment:
+    """AI-powered threat assessment specifically for missionary contexts"""
+    
+    def __init__(self):
+        # Initialize threat assessment parameters
+        self.threat_keywords = {
+            'high': [
+                'persecution', 'arrest', 'detained', 'violence', 'attack', 'killed',
+                'hostage', 'kidnap', 'extremist', 'terrorist', 'banned', 'illegal',
+                'deport', 'expel', 'surveillance', 'monitor', 'raid', 'torture',
+                'missionary expulsion', 'visa denial', 'church closure', 'religious ban'
+            ],
+            'medium': [
+                'restrict', 'limit', 'control', 'regulation', 'law', 'protest',
+                'unrest', 'tension', 'conflict', 'warning', 'threat', 'risk',
+                'opposition', 'hostile', 'suspicious', 'investigate', 'question',
+                'missionary restriction', 'religious registration', 'visa difficulty'
+            ],
+            'low': [
+                'policy', 'change', 'concern', 'attention', 'review', 'scrutiny',
+                'report', 'observe', 'notice', 'track', 'follow', 'watch',
+                'political', 'religious freedom', 'minority', 'group', 'community',
+                'missionary', 'european missionary', 'european church', 'european aid'
+            ]
+        }
+        
+        # Missionary relevance keywords
+        self.missionary_keywords = {
+            'direct': [
+                'missionary', 'christian', 'church', 'evangelist', 'religious worker',
+                'ministry', 'convert', 'baptism', 'bible', 'gospel', 'witness',
+                'faith-based', 'religious organization', 'mission trip', 'outreach',
+                'european missionary', 'european church', 'european christian',
+                'western missionary', 'foreign missionary', 'mission agency'
+            ],
+            'indirect': [
+                'religious freedom', 'worship', 'belief', 'faith', 'prayer', 'religion',
+                'spiritual', 'congregation', 'service', 'community', 'volunteer',
+                'humanitarian', 'aid worker', 'charity', 'nonprofit', 'NGO',
+                'religious affairs', 'religious policy', 'religious registration',
+                'visa policy', 'foreign religious worker', 'religious visa'
+            ],
+            'opportunity': [
+                'open', 'welcome', 'invite', 'allow', 'permit', 'support', 'encourage',
+                'cooperation', 'partnership', 'assistance', 'development', 'education',
+                'medical', 'healthcare', 'training', 'teaching', 'relief', 'humanitarian',
+                'european aid', 'european assistance', 'european partnership',
+                'european development', 'european funding', 'european cooperation'
+            ],
+            'persecution': [
+                'persecution', 'restrict', 'ban', 'prohibit', 'prevent', 'deny',
+                'reject', 'oppose', 'hostile', 'threat', 'danger', 'risk', 'unsafe',
+                'unwelcome', 'illegal', 'criminal', 'punish', 'detain', 'arrest',
+                'visa denial', 'visa restriction', 'expulsion', 'deportation',
+                'foreign agent', 'foreign influence', 'foreign organization',
+                'religious extremism', 'proselytizing ban', 'evangelism restriction'
+            ]
+        }
+        
+        # European missionary impact keywords
+        self.european_missionary_impact = {
+            'direct_impact': [
+                'european missionary', 'european church', 'european christian',
+                'western missionary', 'european aid worker', 'european religious',
+                'european charity', 'european ngo', 'european humanitarian',
+                'eu missionary', 'german missionary', 'british missionary',
+                'french missionary', 'italian missionary', 'spanish missionary',
+                'dutch missionary', 'scandinavian missionary', 'nordic missionary'
+            ],
+            'policy_impact': [
+                'religious visa', 'missionary visa', 'religious worker visa',
+                'foreign religious', 'foreign missionary', 'religious registration',
+                'church registration', 'religious organization law', 'foreign agent law',
+                'foreign funding', 'foreign donation', 'religious extremism law',
+                'anti-proselytizing', 'anti-conversion', 'religious propaganda',
+                'religious education restriction', 'religious publishing restriction'
+            ],
+            'security_impact': [
+                'kidnapping', 'hostage', 'evacuation', 'embassy warning', 'travel advisory',
+                'security threat', 'terrorist threat', 'extremist threat', 'civil unrest',
+                'political instability', 'border closure', 'regional conflict',
+                'religious violence', 'targeted attack', 'foreign national', 'westerner',
+                'european citizen', 'eu citizen', 'diplomatic tension'
+            ],
+            'global_trends': [
+                'religious freedom decline', 'persecution increase', 'missionary access',
+                'humanitarian access', 'visa restriction trend', 'religious nationalism',
+                'religious extremism rise', 'secularization', 'anti-western sentiment',
+                'anti-christian sentiment', 'religious polarization', 'geopolitical tension',
+                'refugee crisis', 'migration crisis', 'diplomatic relations'
+            ]
+        }
+        
+        # Region keywords for geographic focus
+        self.region_keywords = {
+            'middle_east': [
+                'middle east', 'saudi', 'iran', 'iraq', 'syria', 'jordan', 'israel',
+                'palestine', 'lebanon', 'turkey', 'yemen', 'oman', 'qatar', 'bahrain',
+                'uae', 'united arab emirates', 'kuwait'
+            ],
+            'asia': [
+                'china', 'north korea', 'vietnam', 'laos', 'myanmar', 'burma',
+                'thailand', 'cambodia', 'malaysia', 'indonesia', 'philippines',
+                'india', 'pakistan', 'bangladesh', 'nepal', 'bhutan', 'sri lanka',
+                'maldives', 'japan', 'mongolia', 'taiwan', 'hong kong', 'singapore'
+            ],
+            'africa': [
+                'nigeria', 'somalia', 'sudan', 'south sudan', 'ethiopia', 'eritrea',
+                'egypt', 'libya', 'algeria', 'morocco', 'tunisia', 'mali', 'niger',
+                'chad', 'central african republic', 'cameroon', 'kenya', 'tanzania',
+                'uganda', 'rwanda', 'burundi', 'democratic republic of congo',
+                'mozambique', 'zimbabwe', 'south africa'
+            ],
+            'central_asia': [
+                'kazakhstan', 'uzbekistan', 'turkmenistan', 'kyrgyzstan', 'tajikistan',
+                'afghanistan', 'pakistan'
+            ],
+            'europe': [
+                # Eastern Europe
+                'russia', 'ukraine', 'belarus', 'moldova', 'georgia', 'armenia',
+                'azerbaijan', 'turkey', 
+                # Balkans
+                'greece', 'balkans', 'serbia', 'kosovo', 'albania', 'north macedonia', 
+                'bulgaria', 'romania', 'hungary', 'croatia', 'slovenia', 'bosnia', 
+                'herzegovina', 'montenegro',
+                # Western Europe
+                'france', 'germany', 'uk', 'united kingdom', 'britain', 'england', 
+                'scotland', 'wales', 'northern ireland', 'ireland', 'spain', 'portugal', 
+                'italy', 'vatican', 'belgium', 'netherlands', 'luxembourg',
+                # Northern Europe
+                'sweden', 'norway', 'denmark', 'finland', 'iceland', 'estonia', 
+                'latvia', 'lithuania',
+                # Central Europe
+                'poland', 'czech', 'slovakia', 'austria', 'switzerland', 'liechtenstein',
+                # General European terms
+                'european union', 'eu', 'europe', 'schengen', 'eurozone', 'brussels'
+            ],
+            'latin_america': [
+                'mexico', 'cuba', 'venezuela', 'colombia', 'ecuador', 'peru',
+                'bolivia', 'chile', 'argentina', 'brazil', 'guatemala', 'el salvador',
+                'honduras', 'nicaragua', 'costa rica', 'panama'
+            ]
+        }
+        
+        # Europe-specific threat keywords
+        self.europe_threat_keywords = {
+            'high': [
+                'terror', 'attack', 'bombing', 'stabbing', 'shooting', 'riot', 
+                'violent protest', 'far-right', 'neo-nazi', 'extremism', 'antisemitism',
+                'islamophobia', 'xenophobia', 'hate crime', 'deportation', 'trafficking',
+                'migrant crisis', 'refugee crisis'
+            ],
+            'medium': [
+                'secularism', 'religious restrictions', 'anti-religion', 'nationalism', 
+                'populism', 'political tension', 'protest', 'demonstration', 'strike',
+                'civil unrest', 'anti-christian', 'anti-missionary', 'visa restriction',
+                'border control', 'religious registration', 'church registration'
+            ],
+            'low': [
+                'political change', 'election', 'referendum', 'regulation', 'legislation',
+                'religious law', 'secular law', 'church state', 'religious education',
+                'religious symbol', 'cross ban', 'religious dress', 'proselytizing',
+                'evangelism restriction', 'public preaching'
+            ]
+        }
+        
+        # Initialize NLTK sentiment analyzer
+        try:
+            self.sentiment_analyzer = SentimentIntensityAnalyzer()
+        except Exception as e:
+            logger.error(f"Failed to initialize sentiment analyzer: {e}")
+            self.sentiment_analyzer = None
+    
+    def assess_threat_level(self, text: str) -> float:
+        """Assess threat level on a scale of 0-10 based on content"""
+        if not text:
+            return 0.0
+        
+        text = text.lower()
+        
+        # Count keyword occurrences by category
+        high_count = sum(1 for keyword in self.threat_keywords['high'] if keyword in text)
+        medium_count = sum(1 for keyword in self.threat_keywords['medium'] if keyword in text)
+        low_count = sum(1 for keyword in self.threat_keywords['low'] if keyword in text)
+        
+        # Check for Europe-specific keywords if any European region is mentioned
+        is_europe_related = any(keyword in text for keyword in self.region_keywords['europe'])
+        if is_europe_related:
+            high_count += sum(1 for keyword in self.europe_threat_keywords['high'] if keyword in text)
+            medium_count += sum(1 for keyword in self.europe_threat_keywords['medium'] if keyword in text)
+            low_count += sum(1 for keyword in self.europe_threat_keywords['low'] if keyword in text)
+        
+        # Calculate weighted threat score
+        threat_score = (high_count * 3) + (medium_count * 1.5) + (low_count * 0.5)
+        
+        # Normalize to 0-10 scale
+        normalized_score = min(10, threat_score * 1.2)
+        
+        # Include sentiment analysis if available
+        if self.sentiment_analyzer:
+            sentiment = self.sentiment_analyzer.polarity_scores(text)
+            # Negative sentiment increases threat level
+            if sentiment['compound'] < -0.2:
+                # Adjust score based on negativity (more negative = higher threat)
+                sentiment_factor = abs(sentiment['compound']) * 2
+                normalized_score = min(10, normalized_score + sentiment_factor)
+        
+        return round(normalized_score, 1)
+    
+    def assess_missionary_relevance(self, text: str) -> float:
+        """Assess missionary relevance on a scale of 0-10"""
+        if not text:
+            return 0.0
+        
+        text = text.lower()
+        
+        # Count keyword occurrences by category
+        direct_count = sum(1 for keyword in self.missionary_keywords['direct'] if keyword in text)
+        indirect_count = sum(1 for keyword in self.missionary_keywords['indirect'] if keyword in text)
+        opportunity_count = sum(1 for keyword in self.missionary_keywords['opportunity'] if keyword in text)
+        persecution_count = sum(1 for keyword in self.missionary_keywords['persecution'] if keyword in text)
+        
+        # Check for European missionary impact
+        european_impact = self.assess_european_missionary_impact(text)
+        
+        # Calculate weighted relevance score
+        relevance_score = (direct_count * 3) + (indirect_count * 1.5) + \
+                         (opportunity_count * 1) + (persecution_count * 2)
+        
+        # Boost score if there's European missionary impact
+        if european_impact > 0:
+            relevance_score += european_impact * 1.5
+        
+        # Normalize to 0-10 scale
+        normalized_score = min(10, relevance_score * 1.2)
+        
+        return round(normalized_score, 1)
+        
+    def assess_european_missionary_impact(self, text: str) -> float:
+        """Assess specific impact on European missionaries on a scale of 0-10"""
+        if not text:
+            return 0.0
+            
+        text = text.lower()
+        
+        # Count keyword occurrences by category
+        direct_impact = sum(1 for keyword in self.european_missionary_impact['direct_impact'] if keyword in text)
+        policy_impact = sum(1 for keyword in self.european_missionary_impact['policy_impact'] if keyword in text)
+        security_impact = sum(1 for keyword in self.european_missionary_impact['security_impact'] if keyword in text)
+        global_trends = sum(1 for keyword in self.european_missionary_impact['global_trends'] if keyword in text)
+        
+        # Calculate weighted impact score
+        impact_score = (direct_impact * 3) + (policy_impact * 2.5) + \
+                      (security_impact * 2) + (global_trends * 1)
+        
+        # Normalize to 0-10 scale
+        normalized_score = min(10, impact_score * 1.2)
+        
+        return round(normalized_score, 1)
+    
+    def process_intelligence_item(self, item: IntelligenceItem) -> IntelligenceItem:
+        """Process a single intelligence item to extract insights"""
+        # Assess threat level
+        item.threat_level = self.assess_threat_level(item.content)
+        
+        # Assess missionary relevance
+        item.missionary_relevance = self.assess_missionary_relevance(item.content)
+        
+        # Determine region
+        item.region = self.determine_region(item.content)
+        
+        # Extract keywords
+        item.keywords = self.extract_keywords(item.content)
+        
+        # Analyze sentiment if available
+        if self.sentiment_analyzer:
+            sentiment = self.sentiment_analyzer.polarity_scores(item.content)
+            item.sentiment_score = sentiment['compound']
+        
+        # Set confidence level based on source reliability and content quality
+        item.confidence = self.calculate_confidence(item)
+        
+        # Assess European missionary impact
+        european_impact = self.assess_european_missionary_impact(item.content)
+        if european_impact > 0:
+            # Add European missionary impact to keywords
+            if isinstance(item.keywords, dict):
+                item.keywords['european_missionary_impact'] = european_impact
+            elif isinstance(item.keywords, list):
+                item.keywords.append('european_missionary_impact')
+            
+            # Log items with European missionary impact
+            logger.info(f"European missionary impact detected: {item.title} (Impact: {european_impact}, Threat: {item.threat_level})")
+        
+        # Log high threat items
+        if item.threat_level >= 7.0:
+            logger.warning(f"High threat intelligence detected: {item.title} (Level: {item.threat_level})")
+        
+        return item
+    
+    def update_intelligence_item(self, item: IntelligenceItem) -> bool:
+        """Update an existing intelligence item"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+{{ ... }}
+            cursor = conn.cursor()
+            
+            # Convert keywords list to JSON string
+            keywords_json = json.dumps(item.keywords)
+            
+            # Convert investigation data dict to JSON string
+            investigation_data_json = json.dumps(item.investigation_data)
+            
+            # Update in database
+            cursor.execute('''
+                UPDATE intelligence_items SET
+                title = ?, content = ?, source = ?, url = ?,
+                threat_level = ?, missionary_relevance = ?,
+                region = ?, location = ?, keywords = ?,
+                sentiment_score = ?, confidence = ?,
+                investigation_status = ?, investigation_data = ?
+                WHERE id = ?
+            ''', (
+                item.title, item.content, item.source, item.url,
+                item.threat_level, item.missionary_relevance,
+                item.region, item.location, keywords_json,
+                item.sentiment_score, item.confidence, 
+                item.investigation_status, investigation_data_json,
+                item.id
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+            return cursor.rowcount > 0
+            
+        except Exception as e:
+            logger.error(f"Error updating intelligence item: {e}")
+            return False
+    
+    async def process_intelligence_sources(self, sources: List[Dict[str, Any]]) -> Dict[str, List[IntelligenceItem]]:
+        """Process multiple intelligence sources"""
+        results = {}
+        
+        # Initialize navigator if needed
+        if not self.navigator:
+            if not await self.initialize_navigator():
+                return results
+        
+        # Process each source
+        for source in sources:
+            source_name = source.get('name', 'Unknown')
+            source_url = source.get('url', '')
+            source_type = source.get('type', 'website')
+            
+            if not source_url:
+                continue
+            
+            try:
+                # Process based on source type
+                if source_type == 'rss':
+                    items = await self.collect_from_rss(source_url, source_name)
+                    results[source_name] = items
+                elif source_type == 'website':
+                    item = await self.collect_from_website(source_url, source_name)
+                    if item:
+                        results[source_name] = [item]
+                
+                # Update source last checked timestamp
+                self.update_source_timestamp(source_name, source_url)
+                
+            except Exception as e:
+                logger.error(f"Error processing source {source_name}: {e}")
+        
+        return results
+    
+    def update_source_timestamp(self, name: str, url: str) -> None:
+        """Update the last checked timestamp for a source"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Check if source exists
+            cursor.execute('''
+                SELECT id FROM sources WHERE name = ? AND url = ?
+            ''', (name, url))
+            
+            source = cursor.fetchone()
+            
+            if source:
+                # Update existing source
+                cursor.execute('''
+                    UPDATE sources SET last_checked = ? WHERE id = ?
+                ''', (datetime.now().isoformat(), source[0]))
+            else:
+                # Insert new source
+                cursor.execute('''
+                    INSERT INTO sources (name, url, source_type, last_checked, status)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (name, url, 'unknown', datetime.now().isoformat(), 'active'))
+            
+            conn.commit()
+            conn.close()
+            
+        except Exception as e:
+            logger.error(f"Error updating source timestamp: {e}")
+    
+    async def close(self) -> None:
+        """Close resources"""
+        if self.navigator:
+            await self.navigator.close()
+
+class GuardianSystem:
+    """Main orchestrator for running intelligence cycles, alerts, and monitoring"""
+    
+    def __init__(self, config_path: str = 'config/settings.json', sources_path: str = 'config/sources.json'):
+        self.config_path = config_path
+        self.sources_path = sources_path
+        self.config = {}
+        self.sources = []
+        self.collector = None
+        self.running = False
+        self.cycle_count = 0
+        self.last_cycle_time = None
+        self.demo_mode = False
+        
+        # Initialize system
+        self.load_config()
+        self.load_sources()
+        self.collector = IntelligenceCollector(db_path=self.config.get('database_path', 'data/intelligence.db'))
+        
+        # Set up signal handling for graceful shutdown
+        signal.signal(signal.SIGINT, self._handle_shutdown)
+        signal.signal(signal.SIGTERM, self._handle_shutdown)
+    
+    def load_config(self) -> None:
+        """Load system configuration from JSON file"""
+        try:
+            config_file = Path(self.config_path)
+            if not config_file.exists():
+                logger.error(f"Configuration file not found: {self.config_path}")
+                self.config = {}
+                return
+                
+            with open(config_file, 'r') as f:
+                self.config = json.load(f)
+                
+            logger.info(f"Configuration loaded from {self.config_path}")
+            
+        except Exception as e:
+            logger.error(f"Error loading configuration: {e}")
+            self.config = {}
+    
+    def load_sources(self) -> None:
+        """Load intelligence sources from JSON file"""
+        try:
+            sources_file = Path(self.sources_path)
+            if not sources_file.exists():
+                logger.error(f"Sources file not found: {self.sources_path}")
+                self.sources = []
+                return
+                
+            with open(sources_file, 'r') as f:
+                data = json.load(f)
+                self.sources = data.get('sources', [])
+                
+            logger.info(f"Loaded {len(self.sources)} intelligence sources from {self.sources_path}")
+            
+        except Exception as e:
+            logger.error(f"Error loading sources: {e}")
+            self.sources = []
+    
+    async def initialize(self) -> bool:
+        """Initialize the system and its components"""
+        try:
+            # Initialize the intelligence collector
+            if not self.collector:
+                self.collector = IntelligenceCollector(db_path=self.config.get('database_path', 'data/intelligence.db'))
+            
+            # Initialize web navigator
+            headless = self.config.get('stealth', {}).get('headless', True)
+            if not await self.collector.initialize_navigator(headless=headless):
+                logger.error("Failed to initialize web navigator")
+                return False
+            
+            logger.info("Guardian system initialized successfully")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error initializing guardian system: {e}")
+            return False
+    
+    async def run_intelligence_cycle(self) -> Dict[str, Any]:
+        """Run a complete intelligence collection and analysis cycle"""
+        cycle_start = time.time()
+        self.cycle_count += 1
+        cycle_results = {
+            'cycle_id': self.cycle_count,
+            'timestamp': datetime.now().isoformat(),
+            'sources_processed': 0,
+            'items_collected': 0,
+            'high_threats': 0,
+            'errors': 0,
+            'items': []
+        }
+        
+        try:
+            logger.info(f"Starting intelligence cycle {self.cycle_count}")
+            
+            # Process intelligence sources
+            results = await self.collector.process_intelligence_sources(self.sources)
+            
+            # Collect results
+            items_collected = 0
+            high_threats = 0
+            
+            for source_name, items in results.items():
+                items_collected += len(items)
+                
+                # Count high threats
+                for item in items:
+                    if item.threat_level >= 7.0 and item.missionary_relevance >= 5.0:
+                        high_threats += 1
+                        
+                        # Investigate high threats if not in demo mode
+                        if not self.demo_mode:
+                            await self.collector.investigate_intelligence(item)
+                
+                # Add to cycle results
+                cycle_results['items'].extend([asdict(item) for item in items])
+            
+            # Update cycle results
+            cycle_results['sources_processed'] = len(results)
+            cycle_results['items_collected'] = items_collected
+            cycle_results['high_threats'] = high_threats
+            
+            # Calculate cycle duration
+            cycle_duration = time.time() - cycle_start
+            self.last_cycle_time = cycle_duration
+            cycle_results['duration'] = cycle_duration
+            
+            logger.info(f"Completed intelligence cycle {self.cycle_count} in {cycle_duration:.2f}s")
+            logger.info(f"Processed {len(results)} sources, collected {items_collected} items, found {high_threats} high threats")
+            
+            return cycle_results
+            
+        except Exception as e:
+            logger.error(f"Error in intelligence cycle: {e}")
+            logger.error(traceback.format_exc())
+            cycle_results['errors'] = 1
+            cycle_results['error_details'] = str(e)
+            return cycle_results
+    
+    async def run_continuous_monitoring(self, interval_minutes: int = 60) -> None:
+        """Run continuous monitoring with specified interval"""
+        self.running = True
+        
+        try:
+            # Initialize system
+            if not await self.initialize():
+                logger.error("Failed to initialize system for continuous monitoring")
+                return
+            
+            logger.info(f"Starting continuous monitoring with {interval_minutes} minute interval")
+            
+            while self.running:
+                # Run intelligence cycle
+                await self.run_intelligence_cycle()
+                
+                # Check for high threats
+                high_threats = self.collector.get_high_threat_intelligence()
+                if high_threats:
+                    logger.warning(f"Found {len(high_threats)} high threat intelligence items")
+                    
+                    # Process high threats
+                    for item in high_threats:
+                        if item.investigation_status == 'pending':
+                            logger.info(f"Investigating high threat: {item.title}")
+                            await self.collector.investigate_intelligence(item)
+                
+                # Wait for next cycle if still running
+                if self.running:
+                    logger.info(f"Waiting {interval_minutes} minutes until next cycle")
+                    for _ in range(interval_minutes * 60):
+                        if not self.running:
+                            break
+                        await asyncio.sleep(1)
+        
+        except Exception as e:
+            logger.error(f"Error in continuous monitoring: {e}")
+            logger.error(traceback.format_exc())
+        
+        finally:
+            # Cleanup
+            if self.collector:
+                await self.collector.close()
+            
+            logger.info("Continuous monitoring stopped")
+    
+    async def run_demo(self, cycles: int = 1) -> List[Dict[str, Any]]:
+        """Run a demo with specified number of cycles"""
+        self.demo_mode = True
+        results = []
+        
+        try:
+            # Initialize system
+            if not await self.initialize():
+                logger.error("Failed to initialize system for demo")
+                return results
+            
+            logger.info(f"Starting demo with {cycles} cycles")
+            
+            # Run specified number of cycles
+            for i in range(cycles):
+                logger.info(f"Running demo cycle {i+1}/{cycles}")
+                cycle_result = await self.run_intelligence_cycle()
+                results.append(cycle_result)
+                
+                # Wait briefly between cycles
+                if i < cycles - 1:
+                    await asyncio.sleep(2)
+            
+            logger.info(f"Demo completed with {cycles} cycles")
+            return results
+            
+        except Exception as e:
+            logger.error(f"Error in demo: {e}")
+            logger.error(traceback.format_exc())
+            return results
+            
+        finally:
+            # Cleanup
+            self.demo_mode = False
+            if self.collector:
+                await self.collector.close()
+    
+    def get_high_threats(self, limit: int = 10) -> List[IntelligenceItem]:
+        """Get high threat intelligence items"""
+        if not self.collector:
+            return []
+        
+        return self.collector.get_high_threat_intelligence(limit=limit)
+    
+    def get_recent_intelligence(self, limit: int = 10) -> List[IntelligenceItem]:
+        """Get recent intelligence items"""
+        if not self.collector:
+            return []
+        
+        return self.collector.get_recent_intelligence(limit=limit)
+    
+    def stop(self) -> None:
+        """Stop the system"""
+        logger.info("Stopping guardian system")
+        self.running = False
+    
+    def _handle_shutdown(self, signum, frame) -> None:
+        """Handle shutdown signals"""
+        logger.info(f"Received shutdown signal {signum}")
+        self.stop()
+        
+    async def close(self) -> None:
+        """Close the system and release resources"""
+        self.stop()
+        
+        if self.collector:
+            await self.collector.close()
+            
+        logger.info("Guardian system closed")
+async def main() -> None:
+    """Main entry point for the WatchKeeper system"""
+    parser = argparse.ArgumentParser(description='WatchKeeper - Autonomous Intelligence System')
+    parser.add_argument('--demo', action='store_true', help='Run in demo mode')
+    parser.add_argument('--cycles', type=int, default=1, help='Number of intelligence cycles to run in demo mode')
+    parser.add_argument('--monitor', action='store_true', help='Run in continuous monitoring mode')
+    parser.add_argument('--interval', type=int, default=60, help='Interval in minutes between intelligence cycles')
+    args = parser.parse_args()
+    
+    try:
+        # Create guardian system
+        guardian = GuardianSystem()
+        
+        if args.demo:
+            # Run in demo mode
+            logger.info(f"Running in demo mode with {args.cycles} cycles")
+            results = await guardian.run_demo(cycles=args.cycles)
+            
+            # Display summary
+            print("\n" + "="*50)
+            print("WATCHKEEPER DEMO SUMMARY")
+            print("="*50)
+            
+            for i, result in enumerate(results):
+                print(f"\nCycle {i+1}:")
+                print(f"  Sources processed: {result['sources_processed']}")
+                print(f"  Items collected: {result['items_collected']}")
+                print(f"  High threats: {result['high_threats']}")
+                print(f"  Duration: {result.get('duration', 0):.2f} seconds")
+                
+                # Show high threat items
+                if result['high_threats'] > 0:
+                    print("\n  HIGH THREAT ITEMS:")
+                    for item in result['items']:
+                        if item['threat_level'] >= 7.0 and item['missionary_relevance'] >= 5.0:
+                            print(f"    - {item['title']} (Threat: {item['threat_level']}, Relevance: {item['missionary_relevance']})")
+                            if item['location']:
+                                print(f"      Location: {item['location']} ({item['region']})")
+            
+            print("\n" + "="*50)
+            print("Demo completed successfully")
+            
+        elif args.monitor:
+            # Run in continuous monitoring mode
+            logger.info(f"Running in continuous monitoring mode with {args.interval} minute interval")
+            await guardian.run_continuous_monitoring(interval_minutes=args.interval)
+            
+        else:
+            # Run a single intelligence cycle
+            logger.info("Running a single intelligence cycle")
+            result = await guardian.run_intelligence_cycle()
+            
+            # Display summary
+            print("\n" + "="*50)
+            print("WATCHKEEPER INTELLIGENCE CYCLE SUMMARY")
+            print("="*50)
+            print(f"Sources processed: {result['sources_processed']}")
+            print(f"Items collected: {result['items_collected']}")
+            print(f"High threats: {result['high_threats']}")
+            print(f"Duration: {result.get('duration', 0):.2f} seconds")
+            
+            # Show high threat items
+            if result['high_threats'] > 0:
+                print("\nHIGH THREAT ITEMS:")
+                for item in result['items']:
+                    if item['threat_level'] >= 7.0 and item['missionary_relevance'] >= 5.0:
+                        print(f"  - {item['title']} (Threat: {item['threat_level']}, Relevance: {item['missionary_relevance']})")
+                        if item['location']:
+                            print(f"    Location: {item['location']} ({item['region']})")
+            
+            print("\n" + "="*50)
+            
+            # Close guardian
+            await guardian.close()
+        
+    except KeyboardInterrupt:
+        logger.info("Keyboard interrupt received, shutting down")
+        
+    except Exception as e:
+        logger.error(f"Unhandled exception: {e}")
+        logger.error(traceback.format_exc())
+        
+    finally:
+        logger.info("WatchKeeper system shutting down")
+
+
+if __name__ == "__main__":
+    try:
+        # Run the main function
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\nWatchKeeper system terminated by user")
+    except Exception as e:
+        print(f"\nFatal error: {e}")
+        traceback.print_exc()

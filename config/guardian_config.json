@@ -1,0 +1,15 @@
+{
+    "sources_file": "config/combined_sources.json",
+    "enable_all_sources": true,
+    "collection_interval": 15,
+    "database": {
+        "path": "data/intelligence.db",
+        "backup_dir": "data/backups"
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "logs/watchkeeper.log",
+        "max_size": 10485760,
+        "backup_count": 5
+    }
+}
