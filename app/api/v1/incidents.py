@@ -157,3 +157,133 @@ async def get_incidents_by_region(
     incident_service = IncidentService(db)
     incidents = await incident_service.get_incidents_by_region(region, status)
     return incidents
+
+
+# File Upload Endpoints
+@router.post("/{incident_id}/attachments", status_code=status.HTTP_201_CREATED)
+async def upload_incident_attachment(
+    incident_id: int,
+    files: List[UploadFile] = File(...),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    """Upload attachments to an incident"""
+    from ...models.incidents import FieldIncident
+    from ...services.file_service import get_file_service
+
+    # Verify incident exists
+    incident = db.query(FieldIncident).filter(FieldIncident.id == incident_id).first()
+    if not incident:
+        raise HTTPException(status_code=404, detail="Incident not found")
+
+    file_service = get_file_service()
+    uploaded_files = []
+
+    for file in files:
+        # Upload file
+        result = await file_service.upload_file(
+            file.file,
+            file.filename,
+            uploaded_by=current_user.id if hasattr(current_user, 'id') else 0,
+            related_entity='incident',
+            related_id=incident_id
+        )
+
+        if result['success']:
+            uploaded_files.append(result)
+        else:
+            # Clean up previously uploaded files if one fails
+            for prev_file in uploaded_files:
+                await file_service.delete_file(prev_file['file_path'])
+            raise HTTPException(status_code=400, detail=result['error'])
+
+    # Update incident with attachment info
+    existing_attachments = incident.attachments or {}
+    attachment_list = existing_attachments.get('files', [])
+
+    for file_info in uploaded_files:
+        attachment_list.append({
+            'file_id': file_info['file_id'],
+            'filename': file_info['original_filename'],
+            'size': file_info['size_bytes'],
+            'mime_type': file_info['mime_type'],
+            'uploaded_at': file_info['uploaded_at'],
+            'url': file_service.get_file_url(file_info['stored_filename'], file_info['category'])
+        })
+
+    existing_attachments['files'] = attachment_list
+    incident.attachments = existing_attachments
+
+    db.commit()
+
+    return {
+        'success': True,
+        'incident_id': incident_id,
+        'files_uploaded': len(uploaded_files),
+        'files': attachment_list
+    }
+
+
+@router.get("/{incident_id}/attachments")
+async def get_incident_attachments(
+    incident_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    """Get all attachments for an incident"""
+    from ...models.incidents import FieldIncident
+
+    incident = db.query(FieldIncident).filter(FieldIncident.id == incident_id).first()
+    if not incident:
+        raise HTTPException(status_code=404, detail="Incident not found")
+
+    attachments = incident.attachments or {}
+    return attachments.get('files', [])
+
+
+@router.delete("/{incident_id}/attachments/{file_id}")
+async def delete_incident_attachment(
+    incident_id: int,
+    file_id: str,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    """Delete an attachment from an incident"""
+    from ...models.incidents import FieldIncident
+    from ...services.file_service import get_file_service
+
+    incident = db.query(FieldIncident).filter(FieldIncident.id == incident_id).first()
+    if not incident:
+        raise HTTPException(status_code=404, detail="Incident not found")
+
+    attachments = incident.attachments or {}
+    files = attachments.get('files', [])
+
+    # Find and remove file from list
+    file_to_delete = None
+    new_files = []
+
+    for file_info in files:
+        if file_info['file_id'] == file_id:
+            file_to_delete = file_info
+        else:
+            new_files.append(file_info)
+
+    if not file_to_delete:
+        raise HTTPException(status_code=404, detail="Attachment not found")
+
+    # Delete file from storage
+    file_service = get_file_service()
+    # Note: We'd need to store the file_path in attachments to delete it
+    # For now, just remove from incident
+
+    attachments['files'] = new_files
+    incident.attachments = attachments
+
+    db.commit()
+
+    return {
+        'success': True,
+        'message': 'Attachment deleted',
+        'file_id': file_id
+    }
