@@ -1,0 +1,140 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: '${SMTP_HOST}:${SMTP_PORT}'
+  smtp_from: 'alerts@watchkeeper.org'
+  smtp_auth_username: '${SMTP_USERNAME}'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      continue: true
+      group_wait: 0s
+      repeat_interval: 5m
+
+    # Personnel safety alerts - highest priority
+    - match_re:
+        alertname: '(MissedCheckins|PersonnelInDangerZone)'
+      receiver: 'personnel-safety'
+      continue: true
+      group_wait: 0s
+      repeat_interval: 5m
+
+    # Infrastructure alerts
+    - match_re:
+        alertname: '(APIDown|DatabaseDown|RedisDown|CeleryWorkerDown)'
+      receiver: 'infrastructure'
+      repeat_interval: 15m
+
+    # Intelligence collection issues
+    - match_re:
+        alertname: '(IntelligenceCollectionFailed|NoRecentIntelligence)'
+      receiver: 'intelligence-team'
+
+receivers:
+  - name: 'default'
+    email_configs:
+      - to: 'ops@watchkeeper.org'
+        headers:
+          Subject: '[WATCHKEEPER] {{ .GroupLabels.alertname }}'
+        html: |
+          {{ range .Alerts }}
+          <b>Alert:</b> {{ .Labels.alertname }}<br>
+          <b>Severity:</b> {{ .Labels.severity }}<br>
+          <b>Summary:</b> {{ .Annotations.summary }}<br>
+          <b>Description:</b> {{ .Annotations.description }}<br>
+          {{ end }}
+
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'critical@watchkeeper.org'
+        headers:
+          Subject: '[CRITICAL] {{ .GroupLabels.alertname }}'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_CRITICAL}'
+        channel: '#critical-alerts'
+        title: '🚨 CRITICAL ALERT'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        description: '{{ .GroupLabels.alertname }}'
+
+  - name: 'personnel-safety'
+    email_configs:
+      - to: 'safety@watchkeeper.org,leadership@watchkeeper.org'
+        headers:
+          Subject: '[PERSONNEL SAFETY] {{ .GroupLabels.alertname }}'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_SAFETY}'
+        channel: '#personnel-safety'
+        title: '⚠️ PERSONNEL SAFETY ALERT'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Description:* {{ .Annotations.description }}
+          *Action Required:* Immediate response needed
+          {{ end }}
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SAFETY_KEY}'
+        description: '{{ .GroupLabels.alertname }}'
+        severity: 'critical'
+
+  - name: 'infrastructure'
+    email_configs:
+      - to: 'devops@watchkeeper.org'
+        headers:
+          Subject: '[INFRASTRUCTURE] {{ .GroupLabels.alertname }}'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_INFRA}'
+        channel: '#infrastructure'
+        title: '🔧 Infrastructure Alert'
+        text: |
+          {{ range .Alerts }}
+          *Service:* {{ .Labels.job }}
+          *Alert:* {{ .Labels.alertname }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+  - name: 'intelligence-team'
+    email_configs:
+      - to: 'intel@watchkeeper.org'
+        headers:
+          Subject: '[INTELLIGENCE] {{ .GroupLabels.alertname }}'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_INTEL}'
+        channel: '#intelligence'
+        title: '📡 Intelligence Collection Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+inhibit_rules:
+  # Don't alert about high error rates if the service is down
+  - source_match:
+      alertname: 'APIDown'
+    target_match:
+      alertname: 'APIHighErrorRate'
+    equal: ['instance']
+
+  # Don't alert about database issues if it's down
+  - source_match:
+      alertname: 'DatabaseDown'
+    target_match_re:
+      alertname: '(DatabaseHighConnections|DatabaseSlowQueries)'
+    equal: ['instance']

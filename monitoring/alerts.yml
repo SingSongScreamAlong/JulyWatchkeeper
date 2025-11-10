@@ -1,0 +1,204 @@
+groups:
+  - name: watchkeeper_api
+    interval: 30s
+    rules:
+      - alert: APIHighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High API error rate detected"
+          description: "API error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+
+      - alert: APIHighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API response time is high"
+          description: "95th percentile response time is {{ $value }}s"
+
+      - alert: APIDown
+        expr: up{job="watchkeeper_api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "WATCHKEEPER API is down"
+          description: "API has been down for more than 1 minute"
+
+  - name: intelligence_collection
+    interval: 30s
+    rules:
+      - alert: IntelligenceCollectionFailed
+        expr: increase(intelligence_collection_failures_total[1h]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Multiple intelligence collection failures"
+          description: "{{ $value }} collection failures in the last hour"
+
+      - alert: NoRecentIntelligence
+        expr: time() - intelligence_last_collected_timestamp > 3600
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No intelligence collected recently"
+          description: "Last intelligence collection was {{ $value | humanizeDuration }} ago"
+
+  - name: alerts_system
+    interval: 30s
+    rules:
+      - alert: UnacknowledgedCriticalAlerts
+        expr: alerts_unacknowledged{severity="critical"} > 0
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical alerts unacknowledged"
+          description: "{{ $value }} critical alerts have been unacknowledged for over 10 minutes"
+
+      - alert: HighAlertVolume
+        expr: rate(alerts_created_total[1h]) > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High volume of alerts being generated"
+          description: "{{ $value }} alerts created per hour"
+
+  - name: personnel_tracking
+    interval: 30s
+    rules:
+      - alert: MissedCheckins
+        expr: personnel_missed_checkins > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Personnel have missed check-ins"
+          description: "{{ $value }} personnel have missed their check-ins"
+
+      - alert: PersonnelInDangerZone
+        expr: personnel_in_danger_zones > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Personnel in danger zones"
+          description: "{{ $value }} personnel are currently in designated danger zones"
+
+  - name: database
+    interval: 30s
+    rules:
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "Database has been down for more than 1 minute"
+
+      - alert: DatabaseHighConnections
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of database connections"
+          description: "{{ $value }} active database connections"
+
+      - alert: DatabaseSlowQueries
+        expr: rate(pg_stat_activity_max_tx_duration[5m]) > 30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Queries taking longer than 30 seconds detected"
+
+  - name: redis
+    interval: 30s
+    rules:
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache has been down for more than 1 minute"
+
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage is high"
+          description: "Redis is using {{ $value | humanizePercentage }} of available memory"
+
+  - name: celery_workers
+    interval: 30s
+    rules:
+      - alert: CeleryWorkerDown
+        expr: up{job="celery_workers"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Celery worker is down"
+          description: "Background task processing is offline"
+
+      - alert: CeleryHighQueueSize
+        expr: celery_queue_length > 100
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Large Celery task queue backlog"
+          description: "{{ $value }} tasks waiting in queue"
+
+      - alert: CeleryTaskFailureRate
+        expr: rate(celery_tasks_failed_total[1h]) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Celery task failure rate"
+          description: "{{ $value }} task failures per hour"
+
+  - name: system
+    interval: 30s
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value | humanizePercentage }}"
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | humanizePercentage }}"
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining"
