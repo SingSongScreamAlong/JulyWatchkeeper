@@ -1,0 +1,629 @@
+{
+    "additional_sources": [
+        {
+            "name": "US State Department Travel Advisories",
+            "url": "https://travel.state.gov/_res/rss/TAsRSS.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "government_advisory",
+            "country": "usa",
+            "reliability": 10,
+            "enabled": true,
+            "priority": "high",
+            "description": "Official US government travel warnings and advisories"
+        },
+        {
+            "name": "UK Foreign Office Travel Advice",
+            "url": "https://www.gov.uk/foreign-travel-advice.atom",
+            "type": "atom",
+            "language": "en",
+            "category": "government_advisory",
+            "country": "uk",
+            "reliability": 10,
+            "enabled": true,
+            "priority": "high",
+            "description": "UK FCDO travel advisories"
+        },
+        {
+            "name": "Canadian Travel Advisories",
+            "url": "https://travel.gc.ca/rss/travel-advisories",
+            "type": "rss",
+            "language": "en",
+            "category": "government_advisory",
+            "country": "canada",
+            "reliability": 10,
+            "enabled": true,
+            "priority": "high",
+            "description": "Canadian government travel advisories"
+        },
+        {
+            "name": "Australian DFAT Travel Advice",
+            "url": "https://www.smartraveller.gov.au/news-and-updates/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "government_advisory",
+            "country": "australia",
+            "reliability": 10,
+            "enabled": true,
+            "priority": "high",
+            "description": "Australian Department of Foreign Affairs travel advice"
+        },
+        {
+            "name": "OSAC (Overseas Security Advisory Council)",
+            "url": "https://www.osac.gov/Content/RSS.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "security_intelligence",
+            "reliability": 10,
+            "enabled": true,
+            "priority": "high",
+            "description": "US government security intelligence for travelers and businesses"
+        },
+        {
+            "name": "ACLED - Armed Conflict Location",
+            "url": "https://acleddata.com/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "security_intelligence",
+            "reliability": 9,
+            "enabled": true,
+            "priority": "high",
+            "description": "Real-time data on political violence and protests worldwide"
+        },
+        {
+            "name": "Global Conflict Tracker",
+            "url": "https://www.cfr.org/global-conflict-tracker/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "security_intelligence",
+            "reliability": 9,
+            "enabled": true,
+            "description": "Council on Foreign Relations conflict monitoring"
+        },
+        {
+            "name": "Barnabas Fund",
+            "url": "https://barnabasfund.org/en/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 9,
+            "enabled": true,
+            "description": "Aid for persecuted Christians worldwide"
+        },
+        {
+            "name": "Christian Solidarity Worldwide",
+            "url": "https://www.csw.org.uk/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 9,
+            "enabled": true,
+            "description": "Human rights organization specializing in religious freedom"
+        },
+        {
+            "name": "Aid to the Church in Need",
+            "url": "https://acninternational.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 8,
+            "enabled": true,
+            "description": "Catholic charity supporting persecuted Christians"
+        },
+        {
+            "name": "Release International",
+            "url": "https://releaseinternational.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 8,
+            "enabled": true,
+            "description": "Serving persecuted Christians worldwide"
+        },
+        {
+            "name": "World Watch Monitor",
+            "url": "https://www.worldwatchmonitor.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "focus": "persecution",
+            "reliability": 9,
+            "enabled": true,
+            "priority": "high",
+            "description": "News on religious freedom violations worldwide"
+        },
+        {
+            "name": "International Religious Freedom Report",
+            "url": "https://www.state.gov/rss-feed/international-religious-freedom-reports/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_freedom",
+            "reliability": 10,
+            "enabled": true,
+            "description": "US State Department religious freedom monitoring"
+        },
+        {
+            "name": "Pew Research Religion",
+            "url": "https://www.pewresearch.org/religion/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "religious_news",
+            "reliability": 9,
+            "enabled": true,
+            "description": "Research and data on religion worldwide"
+        },
+        {
+            "name": "The Local Poland",
+            "url": "https://www.thelocal.pl/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "poland",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Notes from Poland",
+            "url": "https://notesfrompoland.com/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "poland",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Prague Morning",
+            "url": "https://praguemorning.cz/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "czech_republic",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Romania Insider",
+            "url": "https://www.romania-insider.com/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "romania",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Greece News",
+            "url": "https://greece.greekreporter.com/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "greece",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Portugal News",
+            "url": "https://www.theportugalnews.com/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "portugal",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Dutch News",
+            "url": "https://www.dutchnews.nl/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "netherlands",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Brussels Times",
+            "url": "https://www.brusselstimes.com/feed",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "belgium",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Finnish News (YLE)",
+            "url": "https://yle.fi/news/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "finland",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Baltic Times",
+            "url": "https://www.baltictimes.com/rss/news/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "baltics",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Ukraine News (Kyiv Post)",
+            "url": "https://www.kyivpost.com/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "ukraine",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Moscow Times",
+            "url": "https://www.themoscowtimes.com/rss/news",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "russia",
+            "reliability": 6,
+            "enabled": true
+        },
+        {
+            "name": "Turkey News (Hurriyet Daily)",
+            "url": "https://www.hurriyetdailynews.com/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "turkey",
+            "reliability": 6,
+            "enabled": true
+        },
+        {
+            "name": "Ahval News (Turkey)",
+            "url": "https://ahvalnews.com/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "turkey",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Euractiv",
+            "url": "https://www.euractiv.com/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "focus": "eu_policy",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "The Parliament Magazine",
+            "url": "https://www.theparliamentmagazine.eu/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "focus": "eu_policy",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "SITE Intelligence Group",
+            "url": "https://ent.siteintelgroup.com/RSS-FEED.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "security_intelligence",
+            "focus": "terrorism",
+            "reliability": 9,
+            "enabled": true,
+            "description": "Terrorism and extremism monitoring"
+        },
+        {
+            "name": "Jane's Intelligence",
+            "url": "https://www.janes.com/feeds/",
+            "type": "rss",
+            "language": "en",
+            "category": "security_intelligence",
+            "reliability": 9,
+            "enabled": true,
+            "description": "Defense and security intelligence"
+        },
+        {
+            "name": "Crisis Group",
+            "url": "https://www.crisisgroup.org/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "security_intelligence",
+            "reliability": 9,
+            "enabled": true,
+            "description": "Conflict prevention and resolution"
+        },
+        {
+            "name": "IRIN News (Humanitarian)",
+            "url": "https://www.thenewhumanitarian.org/feed",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 8,
+            "enabled": true,
+            "description": "Humanitarian news and analysis"
+        },
+        {
+            "name": "Doctors Without Borders",
+            "url": "https://www.msf.org/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 9,
+            "enabled": true,
+            "description": "Medical humanitarian crisis updates"
+        },
+        {
+            "name": "International Rescue Committee",
+            "url": "https://www.rescue.org/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "World Vision",
+            "url": "https://www.worldvision.org/feed",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "focus": "christian",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Samaritan's Purse",
+            "url": "https://www.samaritanspurse.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "humanitarian",
+            "focus": "christian",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "WHO Emergency News",
+            "url": "https://www.who.int/rss-feeds/news-english.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "health",
+            "reliability": 10,
+            "enabled": true,
+            "description": "World Health Organization emergency updates"
+        },
+        {
+            "name": "CDC Travel Health Notices",
+            "url": "https://wwwnc.cdc.gov/travel/notices/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "health",
+            "reliability": 10,
+            "enabled": true,
+            "description": "Disease outbreak warnings for travelers"
+        },
+        {
+            "name": "ProMED-mail",
+            "url": "https://promedmail.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "health",
+            "focus": "outbreak",
+            "reliability": 9,
+            "enabled": true,
+            "description": "Disease outbreak reporting system"
+        },
+        {
+            "name": "Global Disaster Alert System",
+            "url": "https://www.gdacs.org/xml/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "disaster",
+            "reliability": 9,
+            "enabled": true,
+            "priority": "high",
+            "description": "Real-time alerts for earthquakes, tsunamis, floods, etc."
+        },
+        {
+            "name": "USGS Earthquakes",
+            "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.atom",
+            "type": "atom",
+            "language": "en",
+            "category": "disaster",
+            "focus": "earthquake",
+            "reliability": 10,
+            "enabled": true
+        },
+        {
+            "name": "NOAA Weather Alerts",
+            "url": "https://www.weather.gov/rss/",
+            "type": "rss",
+            "language": "en",
+            "category": "disaster",
+            "focus": "weather",
+            "reliability": 10,
+            "enabled": true
+        },
+        {
+            "name": "EM-DAT Disasters",
+            "url": "https://www.emdat.be/rss",
+            "type": "rss",
+            "language": "en",
+            "category": "disaster",
+            "reliability": 9,
+            "enabled": true,
+            "description": "International disaster database"
+        },
+        {
+            "name": "Mission Network News",
+            "url": "https://www.mnnonline.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "mission_news",
+            "reliability": 8,
+            "enabled": true,
+            "priority": "high",
+            "description": "News about Christian missions worldwide"
+        },
+        {
+            "name": "Evangelical Missions Quarterly",
+            "url": "https://emqonline.com/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "mission_news",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Lausanne Movement",
+            "url": "https://lausanne.org/feed",
+            "type": "rss",
+            "language": "en",
+            "category": "mission_news",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Operation World",
+            "url": "https://www.operationworld.org/feed",
+            "type": "rss",
+            "language": "en",
+            "category": "mission_news",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "Missio Nexus",
+            "url": "https://missionexus.org/feed/",
+            "type": "rss",
+            "language": "en",
+            "category": "mission_news",
+            "reliability": 7,
+            "enabled": true
+        },
+        {
+            "name": "Le Monde (French)",
+            "url": "https://www.lemonde.fr/rss/une.xml",
+            "type": "rss",
+            "language": "fr",
+            "category": "europe",
+            "region": "france",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Spiegel Online (German)",
+            "url": "https://www.spiegel.de/international/index.rss",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "germany",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "El País (Spanish)",
+            "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/english.elpais.com/portada",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "region": "spain",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Corriere della Sera (Italian)",
+            "url": "https://xml2.corriereobjects.it/rss/homepage.xml",
+            "type": "rss",
+            "language": "it",
+            "category": "europe",
+            "region": "italy",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "NZZ - Neue Zürcher Zeitung",
+            "url": "https://www.nzz.ch/recent.rss",
+            "type": "rss",
+            "language": "de",
+            "category": "europe",
+            "region": "switzerland",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "ORF (Austrian)",
+            "url": "https://rss.orf.at/news.xml",
+            "type": "rss",
+            "language": "de",
+            "category": "europe",
+            "region": "austria",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Migration Policy Institute",
+            "url": "https://www.migrationpolicy.org/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "policy",
+            "focus": "migration",
+            "reliability": 8,
+            "enabled": true
+        },
+        {
+            "name": "European Asylum Support Office",
+            "url": "https://euaa.europa.eu/rss.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "focus": "asylum",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "Frontex",
+            "url": "https://frontex.europa.eu/rss/",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "focus": "borders",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "European Parliament News",
+            "url": "https://www.europarl.europa.eu/rss/doc/top-stories/en.xml",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "focus": "policy",
+            "reliability": 9,
+            "enabled": true
+        },
+        {
+            "name": "European Commission Press",
+            "url": "https://ec.europa.eu/commission/presscorner/api/rss.cfm",
+            "type": "rss",
+            "language": "en",
+            "category": "europe",
+            "focus": "policy",
+            "reliability": 9,
+            "enabled": true
+        }
+    ]
+}
