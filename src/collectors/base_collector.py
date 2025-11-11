@@ -77,8 +77,6 @@ class BaseCollector(ABC):
                     self.logger.info(f"Collected {len(items)} items from {self.source}")
                     
                     # Process and store the collected items
-                    # This would typically involve sending to a queue or database
-                    # For now, we'll just log the number of items
                     for item in items:
                         # Add source metadata
                         item["source"] = {
@@ -86,8 +84,9 @@ class BaseCollector(ABC):
                             "reliability_score": self.reliability_score,
                             "collection_time": time.time()
                         }
-                        
-                        # TODO: Send to processing pipeline
+
+                        # Send to processing pipeline
+                        await self._send_to_pipeline(item)
                 else:
                     self.logger.debug(f"No new items from {self.source}")
                 
@@ -122,13 +121,74 @@ class BaseCollector(ABC):
     def assess_relevance(self, content: Dict[str, Any]) -> float:
         """
         Assess the relevance of content to missionary operations
-        
+
         Args:
             content: Parsed content
-            
+
         Returns:
             float: Relevance score (0.0 to 1.0)
         """
         # Default implementation - should be overridden by subclasses
         # This is a placeholder that gives medium relevance to everything
         return 0.5
+
+    async def _send_to_pipeline(self, item: Dict[str, Any]):
+        """
+        Send collected item to the processing pipeline.
+
+        Creates an Intelligence record in the database and queues it for processing.
+
+        Args:
+            item: Collected intelligence item with metadata
+        """
+        try:
+            from src.core.database import AsyncSessionLocal
+            from src.models.intelligence import Intelligence, ProcessingStatus
+            from src.models.source import Source
+            from sqlalchemy import select
+
+            async with AsyncSessionLocal() as session:
+                # Find or create source
+                result = await session.execute(
+                    select(Source).where(Source.name == self.source)
+                )
+                source = result.scalar_one_or_none()
+
+                if not source:
+                    # Create source if it doesn't exist
+                    from src.models.source import SourceType
+                    source = Source(
+                        name=self.source,
+                        url=item.get("url", ""),
+                        source_type=SourceType.NEWS,  # Default
+                        is_active=True,
+                        reliability_score=self.reliability_score
+                    )
+                    session.add(source)
+                    await session.commit()
+                    await session.refresh(source)
+
+                # Create intelligence item
+                intelligence = Intelligence(
+                    raw_content=item.get("content", ""),
+                    source_id=source.id,
+                    processing_status=ProcessingStatus.PENDING,
+                    ai_analysis_data={"source_metadata": item.get("source", {})}
+                )
+
+                session.add(intelligence)
+                await session.commit()
+                await session.refresh(intelligence)
+
+                self.logger.info(f"Created intelligence item {intelligence.id} from {self.source}")
+
+                # Queue for processing using Celery
+                try:
+                    from src.tasks.intelligence_tasks import process_intelligence_item
+                    process_intelligence_item.delay(intelligence.id)
+                    self.logger.debug(f"Queued intelligence {intelligence.id} for processing")
+                except Exception as e:
+                    self.logger.warning(f"Failed to queue intelligence for processing: {e}")
+
+        except Exception as e:
+            self.logger.error(f"Error sending item to pipeline: {e}", exc_info=True)

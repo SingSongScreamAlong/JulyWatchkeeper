@@ -32,3 +32,29 @@ jsonpath-ng>=1.5.0
 plotly>=5.14.0
 dash>=2.11.0
 kaleido>=0.2.1
+# Background Task Processing
+celery>=5.3.0
+redis>=5.0.0
+# Job Scheduling
+apscheduler>=3.10.0
+# Notifications
+emails>=0.6
+twilio>=8.10.0
+# Export Capabilities
+reportlab>=4.0.0
+openpyxl>=3.1.0
+xlsxwriter>=3.1.0
+# Rate Limiting
+slowapi>=0.1.9
+# Monitoring
+prometheus-client>=0.19.0
+opentelemetry-api>=1.21.0
+opentelemetry-sdk>=1.21.0
+opentelemetry-instrumentation-fastapi>=0.42b0
+# Advanced Search
+elasticsearch>=8.11.0
+# Additional utilities
+python-multipart>=0.0.6
+aiofiles>=23.2.0
+asyncpg>=0.29.0
+geoalchemy2>=0.14.0
