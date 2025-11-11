@@ -1,0 +1,264 @@
+================================================================================
+                    WATCHKEEPER INTELLIGENCE SOURCES
+                         QUICK REFERENCE CARD
+================================================================================
+
+TOTAL SOURCES: 105+
+
+================================================================================
+GOVERNMENT TRAVEL ADVISORIES (10) - PRIORITY: CRITICAL
+================================================================================
+🇺🇸 US State Department          🇬🇧 UK FCDO                    🇨🇦 Canada
+🇦🇺 Australia DFAT               🇩🇪 Germany FA                 🇫🇷 France Min
+🇳🇱 Netherlands                  🇨🇭 Switzerland                🇮🇪 Ireland
+🇸🇪 Sweden
+
+Why: First official warnings, highest reliability (10/10)
+Update: Real-time to daily
+
+================================================================================
+SECURITY INTELLIGENCE (8) - PRIORITY: CRITICAL
+================================================================================
+OSAC (US Gov Security)           ACLED (Conflicts)
+Global Conflict Tracker          SITE Intelligence (Terrorism)
+Jane's Intelligence              Crisis Group
+Stratfor                         GeoSure
+
+Why: Real-time security threats
+Update: Real-time to hourly
+
+================================================================================
+RELIGIOUS FREEDOM (12) - PRIORITY: CRITICAL
+================================================================================
+Open Doors USA ★                 World Watch Monitor ★
+ICC (Int'l Christian Concern)    Voice of the Martyrs
+Barnabas Fund                    Christian Solidarity Worldwide
+Aid to Church in Need            Release International
+US State IRF Report              Christianity Today
+Christian Post                   Pew Research Religion
+
+Why: Direct missionary threat intelligence
+Update: Daily
+★ = Essential for missionary operations
+
+================================================================================
+EUROPEAN COVERAGE (40)
+================================================================================
+
+Pan-European (10):
+BBC Europe, Reuters, Euronews, Politico Europe, EU Observer
+Euractiv, Radio Free Europe, The Guardian, France 24, DW
+
+Western Europe (9):
+France:       The Local, France 24, Le Monde
+Germany:      The Local, DW, Spiegel
+Italy:        The Local, Corriere della Sera
+Spain:        The Local, El País
+Netherlands:  Dutch News
+Belgium:      Brussels Times
+Switzerland:  The Local, NZZ
+Austria:      The Local, ORF
+Portugal:     Portugal News
+
+Northern Europe (6):
+Sweden:       The Local
+Norway:       The Local
+Denmark:      The Local
+Finland:      YLE News
+Ireland:      Irish Times
+Baltics:      Baltic Times
+
+Eastern Europe (6):
+Poland:       The Local, Notes from Poland
+Czech Rep:    Prague Morning
+Romania:      Romania Insider
+Ukraine:      Kyiv Post
+Russia:       Moscow Times
+
+Southern/Other (4):
+Greece:       Greece News
+Turkey:       Hurriyet Daily, Ahval News
+Balkans:      Balkan Insight
+
+EU Policy (5):
+European Parliament, European Commission, Frontex
+Migration Policy Institute, European Asylum Office
+
+================================================================================
+MISSION ORGANIZATIONS (7)
+================================================================================
+Mission Network News ★           Evangelical Missions Quarterly
+Lausanne Movement                Operation World
+Missio Nexus                     World Vision
+Samaritan's Purse
+
+★ = Primary mission intelligence source
+
+================================================================================
+HUMANITARIAN (7)
+================================================================================
+UN News                          Relief Web                    UNHCR
+IRIN News                        Doctors Without Borders       IRC
+Human Rights Watch
+
+================================================================================
+HEALTH & DISASTERS (8) - PRIORITY: CRITICAL
+================================================================================
+Health:
+WHO Emergency News ★             CDC Travel Health ★
+ProMED-mail                      ECDC (EU)
+
+Disasters:
+Global Disaster Alert ★          USGS Earthquakes
+NOAA Weather                     EM-DAT
+
+★ = Real-time alerts
+Why: Immediate evacuation decisions
+
+================================================================================
+REGIONAL COVERAGE
+================================================================================
+Asia (4):          South China Morning Post, The Hindu,
+                   The Japan Times, Asia Times
+
+Africa (2):        Africa News, AllAfrica
+
+Middle East (3):   Times of Israel, Jerusalem Post,
+                   Middle East Eye
+
+Latin America (2): Latin America News, Buenos Aires Times
+
+================================================================================
+COLLECTION ESTIMATES
+================================================================================
+
+Source Count →  Items/Day →  After Filtering →  Critical Alerts
+   105       →    1,050    →      ~120        →      ~5
+
+Noise Removal: 90%
+Relevance Filter: ~11% kept
+Alert Rate: ~0.5% of collected
+
+================================================================================
+SOURCE SELECTION QUICK GUIDE
+================================================================================
+
+MAXIMUM COVERAGE (All 105 sources):
+├─ For comprehensive global intelligence
+└─ Collection: ~1,050 items/day
+
+EUROPE FOCUS (78 sources):
+├─ Government (10) + Security (8) + Religious (12) + Europe (40) + Health (8)
+└─ Collection: ~780 items/day
+
+HIGH PRIORITY ONLY (45 sources):
+├─ Government (10) + Security (8) + Top Religious (6) + Major EU (15) + Health (6)
+└─ Collection: ~450 items/day
+
+COUNTRY-SPECIFIC (35 sources):
+├─ Government (10) + Security (8) + Religious (12) + Country (2-3) + Regional (2-3)
+└─ Collection: ~350 items/day
+
+================================================================================
+RELIABILITY SCALE
+================================================================================
+10/10 ⭐⭐⭐⭐⭐  Government, WHO, UN           (15 sources)
+9/10  ⭐⭐⭐⭐☆  Major news, top NGOs          (35 sources)
+8/10  ⭐⭐⭐⭐   Quality news, established orgs (38 sources)
+7/10  ⭐⭐⭐    Regional news, smaller orgs    (14 sources)
+6/10  ⭐⭐     Local news, blogs              (3 sources)
+
+================================================================================
+MUST-HAVE SOURCES (Minimum Viable Configuration)
+================================================================================
+
+For ANY missionary operation, enable at minimum:
+
+Government (3):
+- US State Department
+- UK FCDO
+- One regional gov (German, French, etc)
+
+Security (2):
+- OSAC
+- ACLED
+
+Religious (3):
+- Open Doors USA
+- World Watch Monitor
+- ICC
+
+Health (2):
+- WHO Emergency News
+- CDC Travel Health
+
+Regional (2-3):
+- Country-specific source
+- Regional news source
+
+MINIMUM: 12-15 sources for basic coverage
+
+================================================================================
+QUICK COMMANDS
+================================================================================
+
+Merge all sources:
+  $ python scripts/merge_sources.py
+
+Test a source:
+  $ python scripts/test_source.py "Source Name"
+
+Enable/disable sources:
+  Edit: config/sources.json → "enabled": true/false
+
+View full documentation:
+  docs/SOURCES_GUIDE.md (500+ lines)
+  docs/SOURCE_MAP.md (visual map)
+
+================================================================================
+PRIORITY ALERTS (Auto-trigger when)
+================================================================================
+✓ Any government travel advisory issued
+✓ OSAC security alert
+✓ ACLED reports violence in mission area
+✓ Open Doors persecution report
+✓ WHO health emergency
+✓ GDACS disaster alert (earthquakes, tsunamis, etc)
+
+Alert Delivery: Email + SMS (for critical) within 60 seconds
+
+================================================================================
+COVERAGE BY MISSION FIELD
+================================================================================
+Europe:           ████████████ 95% (40 sources)
+North America:    ████████████ 90% (10 sources)
+Religious:        ████████████ 90% (12 sources)
+Security:         ████████████ 95% (8 sources)
+Health:           ████████████ 95% (8 sources)
+Asia:             ████░░░░░░░░ 30% (4 sources)
+Africa:           ██░░░░░░░░░░ 20% (2 sources)
+Middle East:      ███░░░░░░░░░ 25% (3 sources)
+Latin America:    ██░░░░░░░░░░ 20% (2 sources)
+
+================================================================================
+LANGUAGES COVERED
+================================================================================
+English:    85 sources (primary)
+French:      5 sources (European coverage)
+German:      5 sources (European coverage)
+Spanish:     3 sources (Latin America)
+Italian:     2 sources (Italy)
+Multi:       5 sources (multiple language editions)
+
+================================================================================
+
+For detailed information, see:
+- SOURCES_GUIDE.md (comprehensive documentation)
+- SOURCE_MAP.md (visual reference)
+- SYSTEM_ARCHITECTURE.md (how sources are processed)
+
+Questions? Check: docs/ directory
+
+================================================================================
+               WATCHKEEPER - Complete Intelligence Visibility
+================================================================================
