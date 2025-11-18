@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from typing import Optional, List
 from pydantic import BaseModel
 from ...services.search_service import get_search_service
-from ...core.auth import get_current_user
+from ...auth import get_current_user
 from ...models.user import User
 
 router = APIRouter()

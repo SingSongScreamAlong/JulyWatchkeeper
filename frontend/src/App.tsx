@@ -7,6 +7,9 @@ import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
+import Login from './components/Login';
+import SearchInterface from './components/SearchInterface';
+import IncidentForm from './components/IncidentForm';
 import websocket from './services/websocket';
 
 const queryClient = new QueryClient({
@@ -21,6 +24,7 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check authentication
@@ -38,27 +42,17 @@ const App: React.FC = () => {
       }
     }
 
+    setIsLoading(false);
+
     return () => {
       websocket.disconnect();
     };
   }, []);
 
-  if (!isAuthenticated) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold mb-4">WATCHKEEPER</h1>
-          <p className="text-gray-600 mb-4">Please log in to access the dashboard</p>
-          <button
-            onClick={() => {
-              // Redirect to login page or show login form
-              window.location.href = '/login';
-            }}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-          >
-            Log In
-          </button>
-        </div>
+        <div className="text-xl">Loading...</div>
       </div>
     );
   }
@@ -67,9 +61,24 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* Public Routes */}
+          <Route
+            path="/login"
+            element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />}
+          />
+
+          {/* Protected Routes */}
+          {isAuthenticated ? (
+            <>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/search" element={<SearchInterface />} />
+              <Route path="/incidents/new" element={<IncidentForm />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </>
+          ) : (
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          )}
         </Routes>
       </Router>
     </QueryClientProvider>

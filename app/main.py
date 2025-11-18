@@ -28,7 +28,7 @@ from .services.metrics_service import MetricsMiddleware
 from .websocket.manager import ConnectionManager
 
 # Import authentication
-from .core.auth import Token, User, authenticate_user, create_access_token, get_current_active_user, ACCESS_TOKEN_EXPIRE_MINUTES
+from .auth import Token, User, authenticate_user, create_access_token, get_current_active_user, ACCESS_TOKEN_EXPIRE_MINUTES
 
 # Load environment variables
 load_dotenv()
